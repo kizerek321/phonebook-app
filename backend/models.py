@@ -1,13 +1,20 @@
-# SQLAlchemy database models
-from sqlalchemy import Table, Column, Integer, String, DateTime, Boolean, MetaData
-from sqlalchemy.ext.declarative import declarative_base
+# SQLmodel database models
+from typing import Optional
+from sqlmodel import Field, SQLModel
 
-Base = declarative_base()
+class ContactBase(SQLModel):
+    name: str = Field(index=True)
+    phone: str = Field(index=True)
 
-class Contact(Base):
-    __tablename__ = "contacts",
-    metadata = MetaData()
+# Physical model in DB
+class Contact(ContactBase, table=True): 
+    id: Optional[int] = Field(default=None, primary_key=True)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    phone = Column(String, index=True)
+# Input schema for creating (Pydantic - inherits name and phone)
+class ContactCreate(ContactBase):
+    pass
+
+# Schema for updating (Pydantic - all fields optional)
+class ContactUpdate(SQLModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
