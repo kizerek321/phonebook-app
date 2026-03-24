@@ -33,8 +33,8 @@ tools = [{
             }
         },
         {
-            "name": "update_phone",
-            "description": "Update an existing contact's phone number in phonebook",
+            "name": "update_contact",
+            "description": "Update an existing contact's phone number or name in phonebook",
             "parameters": {
                 "type": "OBJECT",
                 "properties": {
@@ -45,27 +45,13 @@ tools = [{
                     "new_phone": {
                         "type": "STRING",
                         "description": "New phone number of the person"
-                    }
-                },
-                "required": ["name", "new_phone"]
-            }
-        },
-        {
-            "name": "update_name",
-            "description": "Update an existing contact's name in phonebook",
-            "parameters": {
-                "type": "OBJECT",
-                "properties": {
-                    "old_name": {
-                        "type": "STRING",
-                        "description": "Old name of the person"
                     },
                     "new_name": {
                         "type": "STRING",
                         "description": "New name of the person"
                     }
                 },
-                "required": ["old_name", "new_name"]
+                "required": ["name"]
             }
         },
         {

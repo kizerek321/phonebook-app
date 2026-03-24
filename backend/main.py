@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from sqlmodel import Session, select
 from contextlib import asynccontextmanager
@@ -35,7 +37,7 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 def process_natural_language(request: ChatRequest, session: Session = Depends(get_session)):
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-2.5-flash', # change to gemini-2.0-flash if rate limits are exceeded
         contents=request.prompt,
         config={"tools": tools}
     )
@@ -71,12 +73,13 @@ def process_natural_language(request: ChatRequest, session: Session = Depends(ge
             delete_contact(session, contact.id)
             return {"message": f"Deleted contact: {args['name']}"}
 
-        elif name == "update_phone":
-            update_data = ContactUpdate(phone=args["new_phone"])
-            return update_contact(session, contact.id, update_data)
-
-        elif name == "update_name":
-            update_data = ContactUpdate(name=args["new_name"])
+        elif name == "update_contact":
+            update_fields = {}
+            if "new_name" in args:
+                update_fields["name"] = args["new_name"]
+            if "new_phone" in args:
+                update_fields["phone"] = args["new_phone"]
+            update_data = ContactUpdate(**update_fields)
             return update_contact(session, contact.id, update_data)
 
     return {"error": "Unrecognized operation."}
@@ -105,3 +108,10 @@ def update_contact_endpoint(contact_id: int, contact: ContactUpdate, session: Se
 @app.delete("/contacts/{contact_id}")
 def delete_contact_endpoint(contact_id: int, session: Session = Depends(get_session)):
     return delete_contact(session, contact_id)
+
+# --- Static frontend ---
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
+@app.get("/")
+def serve_frontend():
+    return FileResponse("frontend/index.html")

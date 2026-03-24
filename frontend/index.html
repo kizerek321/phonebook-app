@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Phonebook App — manage your contacts with natural language powered by AI">
+    <title>Phonebook — AI-Powered Contact Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- LEFT PANEL — Contacts -->
+        <section class="panel contacts-panel" id="contacts-panel">
+            <header class="panel-header">
+                <h1>Phonebook</h1>
+                <span class="badge" id="contact-count">0</span>
+            </header>
+            <div class="contacts-list" id="contacts-list">
+                <div class="empty-state" id="empty-state">
+                    <p>No contacts yet.</p>
+                    <p class="hint">Use the chat to add your first contact!</p>
+                </div>
+                <table id="contacts-table" class="hidden">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contacts-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL — Chat -->
+        <section class="panel chat-panel" id="chat-panel">
+            <header class="panel-header">
+                <h1>Chat</h1>
+            </header>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-bubble">
+                        <p>Hi! I'm your phonebook assistant. Try commands like:</p>
+                        <ul>
+                            <li>"Add John with number 123456789"</li>
+                            <li>"What is Joanna's phone number?"</li>
+                            <li>"Delete John"</li>
+                            <li>"Show all contacts"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <form class="chat-input-bar" id="chat-form">
+                <input
+                    type="text"
+                    id="chat-input"
+                    placeholder="Type a command…"
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" id="send-btn" title="Send">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
