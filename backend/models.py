@@ -3,12 +3,12 @@ from typing import Optional
 from sqlmodel import Field, SQLModel
 
 class ContactBase(SQLModel):
-    name: str = Field(index=True)
+    name: str = Field(primary_key=True)
     phone: str = Field(index=True)
 
 # Physical model in DB
 class Contact(ContactBase, table=True): 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    pass
 
 # Input schema for creating (Pydantic - inherits name and phone)
 class ContactCreate(ContactBase):

@@ -16,7 +16,7 @@
 </div>
 
 ### App Overview
-![Phonebook app split-panel interface showing contact list and chat](docs/screenshots/app-overview.png)
+![Phonebook app split-panel interface showing contact list and chat](docs/screenshots/basic.png)
 
 ## Features
 
@@ -25,7 +25,7 @@
 | **Natural Language Interface** | Manage contacts by typing commands in plain English |
 | **LLM-Powered Understanding** | Google Gemini interprets your intent and maps it to the right action |
 | **Full CRUD Operations** | Create, read, update, and delete contacts seamlessly |
-| **Smart Disambiguation** | When multiple contacts share the same name, the app asks you to pick the right one |
+| **Unique Name Enforcement** | Contact names are stored in lowercase and must be unique — no duplicates possible |
 | **Real-Time Chat UI** | A sleek, dark-themed chat interface with loading animations and message bubbles |
 | **Responsive Design** | Split-panel layout that adapts to any screen size |
 | **Instant Sync** | Contact list updates in real time after every chat action |
@@ -118,16 +118,10 @@ The application follows a well-defined pipeline to turn natural language into da
 2. **Frontend sends a `POST /chat`** request with the prompt string as JSON
 3. **FastAPI forwards the prompt to Google Gemini**, attaching a set of [function declarations](https://ai.google.dev/gemini-api/docs/function-calling) that describe the available CRUD operations
 4. **Gemini analyzes the intent** and responds with a structured function call (e.g. `create_contact` with arguments `{name: "John", phone: "123456789"}`)
-5. **FastAPI routes the function call** to the appropriate CRUD handler, executing the database operation via SQLModel
+5. **FastAPI routes the function call** to the appropriate CRUD handler, executing the database operation via SQLModel. All contact names are **stored in lowercase** to prevent case-variant duplicates
 6. **The result is returned** to the frontend, which displays it as a chat message and refreshes the contact list
 
-### Disambiguation Flow
-
-When multiple contacts share the same name, the app handles it gracefully:
-
-1. If the user says *"Delete John"* and there are **2 contacts named John**, the backend returns a disambiguation response
-2. The chat shows **clickable buttons** for each matching contact (displaying name, phone, and ID)
-3. The user clicks the correct contact, and a **follow-up request** is sent using the contact's unique ID
+> **Note:** The `name` field serves as the **primary key** in the database. Each contact must have a unique name. If a user tries to add a contact with an existing name (regardless of letter casing), the app will return an error asking them to choose a unique name.
 
 ---
 
@@ -137,15 +131,15 @@ When multiple contacts share the same name, the app handles it gracefully:
 phonebook-app/
 ├── backend/
 │   ├── __init__.py          # Package marker
-│   ├── main.py              # FastAPI app, routes, chat endpoint, disambiguation logic
+│   ├── main.py              # FastAPI app, routes, chat endpoint
 │   ├── llm.py               # Google GenAI client & function tool declarations
-│   ├── crud.py              # Database operations (create, read, update, delete)
-│   ├── models.py            # SQLModel schemas (Contact, ContactCreate, ContactUpdate)
+│   ├── crud.py              # Database operations (create, read, update, delete) by name
+│   ├── models.py            # SQLModel schemas (name = primary key, stored lowercase)
 │   ├── database.py          # SQLModel engine setup & table initialization
 │   └── .env                 # API key (not tracked in git)
 ├── frontend/
 │   ├── index.html           # Main HTML page with split-panel layout
-│   ├── app.js               # Chat logic, disambiguation UI, contact list rendering
+│   ├── app.js               # Chat logic, contact list rendering
 │   └── style.css            # Dark theme, glassmorphism, animations
 ├── requirements.txt         # Python dependencies
 ├── .gitignore               # Git ignore rules
@@ -223,12 +217,10 @@ Type any of these commands into the chat panel:
 ---
 
 ### Chat with AI
-#### Chat example of adding a new contact via natural language
-![Chat example of adding a new contact via natural language](docs/screenshots/add-contact.png)
-#### Chat example of dealing with double records
-![Chat example of dealing with double records](docs/screenshots/delete-double.png)
-#### Chat example of updating a contact
-![Chat example of updating a contact](docs/screenshots/rename.png)
+#### Chat example of adding a new contact via natural language and dealing with double records by enforcing unique names
+![Chat example of adding a new contact via natural language. Deal with double records by enforcing unique names](docs/screenshots/add-contact.png)
+#### Chat example of updating a contact and asking for all contacts
+![Chat example of updating a contact and asking for all contacts](docs/screenshots/rename.png)
 
 ## API Endpoints
 
@@ -252,10 +244,10 @@ The app exposes both a **chat endpoint** and traditional **REST endpoints**:
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET` | `/contacts` | List all contacts |
-| `POST` | `/contacts` | Create a new contact |
-| `GET` | `/contacts/{id}` | Get a specific contact |
-| `PUT` | `/contacts/{id}` | Update a contact |
-| `DELETE` | `/contacts/{id}` | Delete a contact |
+| `POST` | `/contacts` | Create a new contact (name must be unique) |
+| `GET` | `/contacts/{name}` | Get a specific contact by name |
+| `PUT` | `/contacts/{name}` | Update a contact by name |
+| `DELETE` | `/contacts/{name}` | Delete a contact by name |
 
 > **Interactive docs:** Visit [http://localhost:8000/docs](http://localhost:8000/docs) for the auto-generated Swagger UI.
 
@@ -263,20 +255,17 @@ The app exposes both a **chat endpoint** and traditional **REST endpoints**:
 
 ## LLM Tool Declarations
 
-The backend registers **8 function tools** with Gemini so it can understand a wide range of commands:
+The backend registers **5 function tools** with Gemini so it can understand a wide range of commands:
 
 | Tool | Purpose |
 |---|---|
-| `create_contact` | Add a new contact (name + phone) |
+| `create_contact` | Add a new contact (name must be unique, stored lowercase) |
 | `get_contact` | Find a contact by name |
 | `get_all_contacts` | Retrieve the full contact list |
-| `get_contact_by_id` | Find a contact by unique ID |
 | `delete_contact` | Remove a contact by name |
-| `delete_contact_by_id` | Remove a contact by unique ID |
-| `update_contact` | Edit a contact found by name |
-| `update_contact_by_id` | Edit a contact found by unique ID |
+| `update_contact` | Edit a contact's name or phone number |
 
-The `*_by_id` variants are used internally for disambiguation follow-up actions.
+Since each contact name is unique (primary key), there is no need for ID-based lookups or disambiguation.
 
 ---
 

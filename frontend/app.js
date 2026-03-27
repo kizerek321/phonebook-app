@@ -54,7 +54,6 @@ chatForm.addEventListener('submit', async (e) => {
     chatInput.value = '';
     setSending(true);
 
-    // Show loading indicator
     const loadingEl = addLoading();
 
     try {
@@ -67,11 +66,7 @@ chatForm.addEventListener('submit', async (e) => {
         removeLoading(loadingEl);
 
         const reply = formatResponse(data);
-        if (reply && reply.disambiguation) {
-            addDisambiguationMessage(reply);
-        } else {
-            addMessage(reply, 'bot');
-        }
+        addMessage(reply, 'bot');
 
         // Refresh contacts after every chat action
         await loadContacts();
@@ -117,14 +112,9 @@ function setSending(isSending) {
 }
 
 function formatResponse(data) {
-    // Handle disambiguation response
-    if (data.disambiguation) {
-        return data;  // handled specially in chat submit handler
-    }
-
     // Handle different response shapes from the backend
     if (data.message) return escapeHtml(data.message);
-    if (data.error) return `${escapeHtml(data.error)}`;
+    if (data.error) return escapeHtml(data.error);
 
     // Single contact returned
     if (data.name && data.phone) {
@@ -139,90 +129,6 @@ function formatResponse(data) {
     }
 
     return escapeHtml(JSON.stringify(data));
-}
-
-function addDisambiguationMessage(data) {
-    const div = document.createElement('div');
-    div.className = 'message bot-message';
-
-    const actionLabels = {
-        get: 'Pokaż',
-        delete: 'Usuń',
-        update: 'Edytuj'
-    };
-    const actionLabel = actionLabels[data.action] || data.action;
-
-    const updateArgs = data.update_args || {};
-
-    let buttonsHtml = data.contacts.map(c =>
-        `<button class="disambig-btn" data-action="${escapeHtml(data.action)}" data-id="${c.id}">` +
-        `<strong>${escapeHtml(c.name)}</strong> — ${escapeHtml(c.phone)} <span class="disambig-id">(id: ${c.id})</span>` +
-        `</button>`
-    ).join('');
-
-    div.innerHTML = `
-        <div class="message-bubble">
-            <p>${escapeHtml(data.message)}</p>
-            <div class="disambig-buttons">${buttonsHtml}</div>
-        </div>`;
-
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Attach click handlers
-    div.querySelectorAll('.disambig-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const action = btn.dataset.action;
-            const id = btn.dataset.id;
-            let prompt;
-            if (action === 'get') {
-                prompt = `Show contact with id ${id}`;
-            } else if (action === 'delete') {
-                prompt = `Delete contact with id ${id}`;
-            } else {
-                // Build update prompt with the original update details
-                const parts = [];
-                if (updateArgs.new_name) parts.push(`name to ${updateArgs.new_name}`);
-                if (updateArgs.new_phone) parts.push(`phone to ${updateArgs.new_phone}`);
-                const details = parts.length > 0 ? `, change ${parts.join(' and ')}` : '';
-                prompt = `Update contact with id ${id}${details}`;
-            }
-            // Disable all buttons after selection
-            div.querySelectorAll('.disambig-btn').forEach(b => b.disabled = true);
-            sendFollowUp(prompt);
-        });
-    });
-}
-
-async function sendFollowUp(prompt) {
-    addMessage(prompt, 'user');
-    setSending(true);
-    const loadingEl = addLoading();
-
-    try {
-        const res = await fetch('/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-        });
-        const data = await res.json();
-        removeLoading(loadingEl);
-
-        const reply = formatResponse(data);
-        if (reply && reply.disambiguation) {
-            addDisambiguationMessage(reply);
-        } else {
-            addMessage(reply, 'bot');
-        }
-        await loadContacts();
-    } catch (err) {
-        removeLoading(loadingEl);
-        addMessage('Something went wrong. Please try again.', 'bot');
-        console.error('Chat error:', err);
-    } finally {
-        setSending(false);
-        chatInput.focus();
-    }
 }
 
 // ===== Utilities =====

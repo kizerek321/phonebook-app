@@ -11,11 +11,11 @@ tools = [{
     "function_declarations":[
         {
             "name": "create_contact",
-            "description": "Create a new contact in phonebook",
+            "description": "Create a new contact in phonebook. Each contact name must be unique.",
             "parameters": {
                 "type": "OBJECT",
                 "properties": {
-                    "name": {"type": "STRING", "description": "Name of the person"},
+                    "name": {"type": "STRING", "description": "Name of the person (must be unique)"},
                     "phone": {"type": "STRING", "description": "Phone number of the person"}
                 },
                 "required": ["name", "phone"]
@@ -23,7 +23,7 @@ tools = [{
         },
         {
             "name": "delete_contact",
-            "description": "Delete a contact from phonebook",
+            "description": "Delete a contact from phonebook by name",
             "parameters": {
                 "type": "OBJECT",
                 "properties": {
@@ -40,7 +40,7 @@ tools = [{
                 "properties": {
                     "name": {
                         "type": "STRING",
-                        "description": "Name of the person"
+                        "description": "Current name of the person"
                     },
                     "new_phone": {
                         "type": "STRING",
@@ -48,7 +48,7 @@ tools = [{
                     },
                     "new_name": {
                         "type": "STRING",
-                        "description": "New name of the person"
+                        "description": "New name of the person (must be unique)"
                     }
                 },
                 "required": ["name"]
@@ -56,7 +56,7 @@ tools = [{
         },
         {
             "name": "get_contact",
-            "description": "Get a contact from phonebook",
+            "description": "Get a contact from phonebook by name",
             "parameters": {
                 "type": "OBJECT",
                 "properties": {
@@ -68,41 +68,6 @@ tools = [{
         {
             "name": "get_all_contacts",
             "description": "Get all contacts from phonebook"
-        },
-        {
-            "name": "get_contact_by_id",
-            "description": "Get a specific contact from phonebook by their unique ID",
-            "parameters": {
-                "type": "OBJECT",
-                "properties": {
-                    "id": {"type": "STRING", "description": "Unique ID of the contact"}
-                },
-                "required": ["id"]
-            }
-        },
-        {
-            "name": "delete_contact_by_id",
-            "description": "Delete a specific contact from phonebook by their unique ID",
-            "parameters": {
-                "type": "OBJECT",
-                "properties": {
-                    "id": {"type": "STRING", "description": "Unique ID of the contact"}
-                },
-                "required": ["id"]
-            }
-        },
-        {
-            "name": "update_contact_by_id", 
-            "description": "Update a specific contact from phonebook by their unique ID",
-            "parameters": {
-                "type": "OBJECT",
-                "properties": {
-                    "id": {"type": "STRING", "description": "Unique ID of the contact"},
-                    "new_name": {"type": "STRING", "description": "New name of the contact"},
-                    "new_phone": {"type": "STRING", "description": "New phone number of the contact"}
-                },
-                "required": ["id"]
-            }
         }
     ]
 }]
