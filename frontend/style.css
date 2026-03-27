@@ -364,6 +364,54 @@ tbody tr {
     40% { transform: scale(1); opacity: 1; }
 }
 
+/* ===== DISAMBIGUATION BUTTONS ===== */
+.disambig-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.disambig-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.disambig-btn:hover {
+    background: rgba(108, 92, 231, 0.15);
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.disambig-btn:active {
+    transform: translateX(2px);
+}
+
+.disambig-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.disambig-btn strong {
+    color: var(--accent-light);
+}
+
+.disambig-id {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .app {

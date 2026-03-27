@@ -68,6 +68,41 @@ tools = [{
         {
             "name": "get_all_contacts",
             "description": "Get all contacts from phonebook"
+        },
+        {
+            "name": "get_contact_by_id",
+            "description": "Get a specific contact from phonebook by their unique ID",
+            "parameters": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {"type": "STRING", "description": "Unique ID of the contact"}
+                },
+                "required": ["id"]
+            }
+        },
+        {
+            "name": "delete_contact_by_id",
+            "description": "Delete a specific contact from phonebook by their unique ID",
+            "parameters": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {"type": "STRING", "description": "Unique ID of the contact"}
+                },
+                "required": ["id"]
+            }
+        },
+        {
+            "name": "update_contact_by_id", 
+            "description": "Update a specific contact from phonebook by their unique ID",
+            "parameters": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {"type": "STRING", "description": "Unique ID of the contact"},
+                    "new_name": {"type": "STRING", "description": "New name of the contact"},
+                    "new_phone": {"type": "STRING", "description": "New phone number of the contact"}
+                },
+                "required": ["id"]
+            }
         }
     ]
 }]
